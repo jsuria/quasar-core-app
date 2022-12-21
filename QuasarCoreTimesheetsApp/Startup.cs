@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using QuasarCoreTimesheetsApp.Auth;
+using Microsoft.EntityFrameworkCore;
+using MySql.EntityFrameworkCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +26,14 @@ namespace QuasarCoreTimesheetsApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<UserContext>(optionsBuilder =>
+            {
+                // Need to EXPLICITLY import these 2:
+                // using Microsoft.EntityFrameworkCore;
+                // using MySql.EntityFrameworkCore.Extensions; <-- install v5.0.10
+                //
+                optionsBuilder.UseMySQL(Configuration.GetConnectionString("Timesheets"));
+            });
             services.AddControllersWithViews();
         }
 

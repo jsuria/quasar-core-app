@@ -26,7 +26,21 @@ namespace QuasarCoreTimesheetsApp.Auth
             builder.Entity<IdentityUserToken<int>>(x =>
             {
                 x.Property(token => token.LoginProvider).HasMaxLength(128);
+                x.Property(token => token.Name).HasMaxLength(128);
             });
+
+            // Entity types
+            // Go through each one and convert to int
+            foreach(var entityType in builder.Model.GetEntityTypes())
+            {
+                foreach(var property in entityType.GetProperties())
+                {
+                    if(property.ClrType == typeof(bool))
+                    {
+                        property.SetValueConverter(new BoolToIntConverter());
+                    }
+                }
+            }
         }
     }
 }
