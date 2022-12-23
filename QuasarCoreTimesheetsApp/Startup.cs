@@ -6,11 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QuasarCoreTimesheetsApp.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MySql.EntityFrameworkCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace QuasarCoreTimesheetsApp
 {
@@ -26,6 +30,22 @@ namespace QuasarCoreTimesheetsApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Set up authentication using JWT (json web tokens)
+            services.AddAuthentication(authBuilder =>
+            {
+                authBuilder.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(jwtOptions =>
+            {
+                // Used SHA256 random hash (https://www.ipvoid.com/random-sha256-hash/)
+                var key = Configuration.GetValue<string>("Auth:Jwtkey");
+                jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
             services.AddDbContext<UserContext>(optionsBuilder =>
             {
                 // Need to EXPLICITLY import these 2:
@@ -34,6 +54,21 @@ namespace QuasarCoreTimesheetsApp
                 //
                 optionsBuilder.UseMySQL(Configuration.GetConnectionString("Timesheets"));
             });
+
+            services.AddIdentity<User, Role>()
+                    .AddEntityFrameworkStores<UserContext>()
+                    .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(configOptions =>
+            {
+                // Add support for special characters in username
+                configOptions.User.AllowedUserNameCharacters += "Â‰ˆ≈ƒ÷";
+                configOptions.Password.RequireDigit = false;        
+                configOptions.Password.RequiredLength = 6;          // min 6 chars
+                configOptions.Password.RequireLowercase = false;    // Case insensitive
+                configOptions.Password.RequireUppercase = false;
+            });
+
             services.AddControllersWithViews();
         }
 
