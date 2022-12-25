@@ -13,6 +13,6 @@ namespace QuasarCoreTimesheetsApp.Data
         public TimeSpan StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
         public string Comment { get; set; }
-        public bool Abscence { get; set; }
+        public bool Absence { get; set; }
     }
 }
