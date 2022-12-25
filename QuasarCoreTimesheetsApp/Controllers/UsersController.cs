@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,16 +17,17 @@ using System.Threading.Tasks;
 
 namespace QuasarCoreTimesheetsApp.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Limits access to authenticated users
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : BaseController
+    public class UsersController : BaseController
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _configuration;         // need to access the appsettings.json values
 
-        public UserController(
+        public UsersController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             RoleManager<Role> roleManager,
@@ -38,6 +41,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]        // if not set, returns a 401
         public async Task<IActionResult> Register([FromBody]RegisterRequest request) 
         {
             var user = new User
@@ -58,6 +62,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]        // if not set, returns a 401
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -76,6 +81,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return await LoginSuccessResponse(user);
         }
 
+        [HttpPost("refreshtoken")]
         public async Task<IActionResult> RefreshToken()
         {
             var userId = GetUserId();
@@ -105,8 +111,8 @@ namespace QuasarCoreTimesheetsApp.Controllers
             }
 
             // Configuring access token for this user
-            var key = _configuration.GetValue<string>("Auth:Jwt");
-            var token = new JwtSecurityToken(
+            string key = _configuration.GetValue<string>("Auth:JwtKey");
+            JwtSecurityToken token = new JwtSecurityToken(
                     claims: claims,
                     expires: DateTime.UtcNow.AddMinutes(30),
                     signingCredentials: new SigningCredentials(

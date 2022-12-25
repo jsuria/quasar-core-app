@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using QuasarCoreTimesheetsApp.Data;
+using AutoMapper;
+using QuasarCoreTimesheetsApp.Models;
 
 namespace QuasarCoreTimesheetsApp
 {
@@ -69,7 +72,24 @@ namespace QuasarCoreTimesheetsApp
                 configOptions.Password.RequireUppercase = false;
             });
 
+            // Automapper configuration
+            services.AddTransient<ITimesheetRepository>(_ => {
+                return new TimesheetRepository(Configuration.GetConnectionString("Timesheets"));
+            });
+
+            // We're mapping models to responses
+            var mapper = new MapperConfiguration(configMapper =>
+            {
+                configMapper.CreateMap<Timesheet, TimesheetResponseModel>();
+                configMapper.CreateMap<UserTimesheet, TimesheetResponseModel>();
+            }).CreateMapper();
+
+            services.AddSingleton(mapper);  // this is how dotnet core rolls
+
+            //services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0);
+
             services.AddControllersWithViews();
+            //services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

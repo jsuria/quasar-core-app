@@ -11,9 +11,7 @@ namespace QuasarCoreTimesheetsApp.Auth
     // Overriding the default Identity 
     public class UserContext : IdentityDbContext<User, Role, int>
     { 
-        public UserContext(DbContextOptions<UserContext> options) : base(options)
-        {
-        }
+        public UserContext(DbContextOptions<UserContext> options) : base(options) {}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -31,16 +29,25 @@ namespace QuasarCoreTimesheetsApp.Auth
 
             // Entity types
             // Go through each one and convert to int
-            foreach(var entityType in builder.Model.GetEntityTypes())
+            try
             {
-                foreach(var property in entityType.GetProperties())
+                foreach(var entityType in builder.Model.GetEntityTypes())
                 {
-                    if(property.ClrType == typeof(bool))
+                    foreach(var property in entityType.GetProperties())
                     {
-                        property.SetValueConverter(new BoolToIntConverter());
+                        if(property.ClrType == typeof(bool))
+                        {
+                            property.SetValueConverter(new BoolToIntConverter());
+                        }
                     }
                 }
+                
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            
         }
     }
 }
