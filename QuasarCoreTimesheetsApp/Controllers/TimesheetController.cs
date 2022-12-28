@@ -73,6 +73,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return Ok(result);
         }
 
+      
         // Listing for specific user
         [HttpGet("")]
         public IActionResult List(DateTime startDate, DateTime endDate)
@@ -91,6 +92,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
 
         // Listing for admin/supervisor
         [HttpGet("all")]
+        [Authorize(Roles ="admin")]
         public IActionResult ListAll(DateTime startDate, DateTime endDate)
         {
             // Checking for existing timesheets within this range
@@ -114,7 +116,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
         }
 
         // Endpoint for absence
-        [HttpGet("all")]
+        [HttpGet("absence")]
         public IActionResult CreateAbsence([FromBody]AbsenceRequestModel absenceRequest)
         {
             var userId = GetUserId();
@@ -137,7 +139,19 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return Ok(result);
         }
 
+        [HttpGet("absence/{id}")]
+        public IActionResult DeleteAbsence(int id)
+        {
+            var timesheet = _timesheetRepository.GetTimesheet(id);
 
+            if(timesheet == null || timesheet.UserId != GetUserId() || !timesheet.Absence)
+            {
+                return BadRequest();
+            }
+
+            _timesheetRepository.DeleteTimesheet(id);
+            return Ok();
+        }
 
         // Calculation for flextime on listing
         private void CalculateFlexTime(UserTimesheetListResponseModel userTimesheetList)
@@ -169,7 +183,6 @@ namespace QuasarCoreTimesheetsApp.Controllers
 
                 }
             }
-            
         }
 
 /*

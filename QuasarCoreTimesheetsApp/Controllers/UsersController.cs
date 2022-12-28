@@ -42,7 +42,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]        // if not set, returns a 401
-        public async Task<IActionResult> Register([FromBody]RegisterRequest request) 
+        public async Task<IActionResult> Register([FromBody]RegisterRequestModel request) 
         {
             var user = new User
             {
@@ -63,7 +63,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]        // if not set, returns a 401
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestModel request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
