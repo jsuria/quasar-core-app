@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             _configuration = configuration;
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpPost("register")]
         [AllowAnonymous]        // if not set, returns a 401
         public async Task<IActionResult> Register([FromBody]RegisterRequestModel request) 
@@ -61,6 +63,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return await LoginSuccessResponse(user);
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpPost("login")]
         [AllowAnonymous]        // if not set, returns a 401
         public async Task<IActionResult> Login([FromBody] LoginRequestModel request)
@@ -81,6 +84,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return await LoginSuccessResponse(user);
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpPost("refreshtoken")]
         public async Task<IActionResult> RefreshToken()
         {

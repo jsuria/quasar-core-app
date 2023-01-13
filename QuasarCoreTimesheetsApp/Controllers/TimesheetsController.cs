@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using QuasarCoreTimesheetsApp.Data;
 using QuasarCoreTimesheetsApp.Models;
@@ -14,17 +15,18 @@ namespace QuasarCoreTimesheetsApp.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Limits access to authenticated users
     [Route("api/[controller]")]
     [ApiController]
-    public class TimesheetController : BaseController
+    public class TimesheetsController : BaseController
     {
         private readonly ITimesheetRepository _timesheetRepository;
         private readonly IMapper _mapper;
 
-        public TimesheetController(ITimesheetRepository timesheetRepository, IMapper mapper)
+        public TimesheetsController(ITimesheetRepository timesheetRepository, IMapper mapper)
         {
             _timesheetRepository = timesheetRepository;
             _mapper = mapper;
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpPut("start")]
         public IActionResult Start()
         {
@@ -54,6 +56,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return Ok(result);
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpPut("{id}/end")]      // or end/{id}
         public IActionResult End(int id)
         {
@@ -73,8 +76,9 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return Ok(result);
         }
 
-      
+
         // Listing for specific user
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpGet("")]
         public IActionResult List(DateTime startDate, DateTime endDate)
         {
@@ -91,6 +95,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
          }
 
         // Listing for admin/supervisor
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpGet("all")]
         [Authorize(Roles ="admin")]
         public IActionResult ListAll(DateTime startDate, DateTime endDate)
@@ -116,6 +121,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
         }
 
         // Endpoint for absence
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpGet("absence")]
         public IActionResult CreateAbsence([FromBody]AbsenceRequestModel absenceRequest)
         {
@@ -139,6 +145,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
             return Ok(result);
         }
 
+        [EnableCors("PolicyLocalhostWithOrigins")]
         [HttpGet("absence/{id}")]
         public IActionResult DeleteAbsence(int id)
         {
