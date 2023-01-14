@@ -35,7 +35,7 @@ export default {
     return axios.post('users/login', data);
   },
   refreshToken(){
-    return axios.get('users/refreshtoken', { withCredentials: true });
+    return axios.post('users/refreshtoken', { withCredentials: true });
   },
   getTimesheets(startDate, endDate){
     var query = {

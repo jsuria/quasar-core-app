@@ -126,13 +126,14 @@ export default {
       startDate: null,
       endDate: null,
       dates: [],
-      people: []
+      people: [],
+      is_development: true,
     }
   },
   computed:{
     isOverview(){
       return this.$route.name === 'overview';
-    }
+    },
   },
   watch:{
     $route(){
@@ -140,6 +141,11 @@ export default {
     }
   },
   methods:{
+
+    isToday(){
+
+    },
+
     previousPeriod(){
       this.movePeriod(-1);
     },
@@ -216,9 +222,13 @@ export default {
       }
       if(response.status == 200){
 
-        console.log("Index: fetchData() ", response.data)
+        //console.log("Index: fetchData() ", Object.entries(response.data))
+        const distilledResponse = []
+        distilledResponse.push(response.data)
+        //console.log(distilledResponse)
 
-        this.people = response.data.map(d => {
+        //this.people = response.data.map(d => {
+        this.people = distilledResponse.map(d => {
           var entries = [];
           for(var i = 0; i < days; i++){
             var date = moment(start).add(i, 'days');
@@ -228,6 +238,8 @@ export default {
             var timesheet = d.timesheets.find(t => moment(t.date).isSame(date));
             var entry = {
               date: date.add(12,'hours').toDate(),
+              // Currently supports 5-day workweek only
+              // Add support for weekend
               canStart: isToday && !timesheet && !isWeekend && !this.isOverview,
               canEnd: isToday && timesheet && !timesheet.absence && !timesheet.endTime && !this.isOverview,
               canSetAbsence: (isToday || isFuture) && !timesheet && !isWeekend && !this.isOverview,

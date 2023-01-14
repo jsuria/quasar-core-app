@@ -86,7 +86,7 @@ namespace QuasarCoreTimesheetsApp
 
             services.AddSingleton(mapper);  // this is how dotnet core rolls
 
-            services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0);
+            //services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0);
 
             services.AddCors(options =>
             {
