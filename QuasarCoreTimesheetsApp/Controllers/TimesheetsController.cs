@@ -161,12 +161,15 @@ namespace QuasarCoreTimesheetsApp.Controllers
         }
 
         // Calculation for flextime on listing
-        private void CalculateFlexTime(UserTimesheetListResponseModel userTimesheetList)
+        private void CalculateFlexTime(params UserTimesheetListResponseModel[] timesheetLists)
         {
-            CalculateFlexTime(userTimesheetList.Timesheets);
+            foreach (var list in timesheetLists)
+            {
+                CalculateFlexTime(list.Timesheets);
 
-            var timesheets = userTimesheetList.Timesheets.Where(utsl => utsl.FlexTime.HasValue);
-            userTimesheetList.FlexTime = TimeSpan.FromSeconds(timesheets.Sum(ts => ts.FlexTime.Value.TotalSeconds));
+                var timesheets = list.Timesheets.Where(t => t.FlexTime.HasValue);
+                list.FlexTime = TimeSpan.FromSeconds(timesheets.Sum(t => t.FlexTime.Value.TotalSeconds));
+            }
         }
 
         // in C#, params allows variable number of arguments
@@ -185,7 +188,7 @@ namespace QuasarCoreTimesheetsApp.Controllers
 
                     if (workingHours.TotalHours > 6)
                     {
-                        timesheet.FlexTime = timesheet.FlexTime - TimeSpan.FromMinutes(30);
+                        timesheet.FlexTime -= timesheet.FlexTime - TimeSpan.FromMinutes(30);
                     }
 
                 }
